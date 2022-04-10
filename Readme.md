@@ -12,7 +12,9 @@ I wanted something simpler. I wanted to be able to iterate on the base image qui
 
 ## Solution
 
-This repository allows me to do this. I can setup the base image (packages, user accounts, config) exactly as I want using the Dockerfile. I can iterate locally on the Dockerfile. I push the changes to Github and Github Actions runs and produces an image I can flash to an sd-card. This image is stored in the action workflow as an [artifact](https://docs.github.com/en/actions/using-workflows/storing-workflow-data-as-artifacts)
+Using Docker and [buildx](https://docs.docker.com/buildx/working-with-buildx/) this repository is setup to create arm64 docker images. These images can then be turned into sd-card flashable .img files using the `create-image.sh` script. This script use nvidia l4t scripts to configure the rootfs with the correct boot files.
+
+Finally, all of this is automatically run with Github actions. After pushing a change to the repo, actions run and produce [artifacts](https://docs.github.com/en/actions/using-workflows/storing-workflow-data-as-artifacts) with `.img` files that I can flash to an sd-card.
 
 Here's a screenshot of the artifact ready to download.
 
