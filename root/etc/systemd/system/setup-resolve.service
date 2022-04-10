@@ -1,0 +1,12 @@
+# https://forums.developer.nvidia.com/t/resolv-conf-being-overwritten/45629
+[Unit]
+Description=Symlink /etc/resolv.conf to systemd
+Requires=local-fs.target
+
+[Service]
+Type=oneshot
+TimeoutSec=infinity
+ExecStart=ln -sf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
+
+[Install]
+RequiredBy=network.target

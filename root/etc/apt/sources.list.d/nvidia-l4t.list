@@ -1,0 +1,2 @@
+deb [signed-by=/usr/share/keyrings/nvidia-l4t-archive-keyring.asc] https://repo.download.nvidia.com/jetson/common r32.6 main
+deb [signed-by=/usr/share/keyrings/nvidia-l4t-archive-keyring.asc] https://repo.download.nvidia.com/jetson/t210 r32.6 main

@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - board: jetson-nano
+            revision: 300
+
+    env:
+      JETSON_ROOTFS_DIR: /tmp/jetson-builder/rootfs
+      JETSON_BUILD_DIR: /tmp/jetson-builder/build
+      JETSON_NANO_BOARD: ${{ matrix.board }}
+      JETSON_NANO_REVISION: ${{ matrix.revision }}
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+
+      - name: Build docker image
+        run: docker buildx build --platform linux/arm64 -t jetson-nano-image .
+
+      - name: Export rootfs
+        run: |
+          docker export $(docker create --name nano-rootfs --platform linux/arm64 jetson-nano-image) -o rootfs.tar
+          docker rm nano-rootfs
+          mkdir -p /tmp/jetson-builder/rootfs
+          sudo tar --same-owner -xf rootfs.tar -C /tmp/jetson-builder/rootfs
+
+      - name: Create jetson.img
+        run: |
+          sudo apt install -y libxml2-utils
+          sudo -E ./create-image.sh
+
+      - name: Upload image
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ matrix.board }}-r${{ matrix.revision }}
+          path: |
+            jetson.img
