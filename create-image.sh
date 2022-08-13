@@ -43,6 +43,21 @@ if [ ! "$(ls -A $JETSON_BUILD_DIR)" ]; then
         printf "\e[32mDownload L4T...       "
         wget -qO- $BSP | tar -jxpf - -C $JETSON_BUILD_DIR
         printf "[OK]\n"
+
+        # Fix nvidia's bugs in various BSP scripts
+        case "$BSP" in
+            *32.5*)
+                # Fix link dereferencing in 32.5 for xavier. Adds "-a" flag to "cp" command.
+                # Without it nVidia's script fails to copy any symlinks from rootfs into recovery image which crashes the whole image creation process.
+                sed -i 's/cp -f/cp -af/g' "$JETSON_BUILD_DIR/Linux_for_Tegra/tools/ota_tools/version_upgrade/ota_make_recovery_img_dtb.sh"
+                ;;
+            *32.6*)
+                # When preallocating loopback image space for root, nvidia's script uses ((rootfs_size + (rootfs_size /10))
+                # In case of a 400MiB rootfs, this causes the same script to fail copying rootfs into the root image.
+                # So we arbitraryly preallocate extra 128MiB ((rootfs_size + 128MiB + (rootfs_size / 10))
+                sed -i 's/rootfs_size +/rootfs_size + 128 +/g' "$JETSON_BUILD_DIR/Linux_for_Tegra/tools/jetson-disk-image-creator.sh"
+                ;;
+        esac     
 fi
 
 case "$JETSON_NANO_BOARD" in
