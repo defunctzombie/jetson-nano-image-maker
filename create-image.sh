@@ -43,6 +43,19 @@ if [ ! "$(ls -A $JETSON_BUILD_DIR)" ]; then
         printf "\e[32mDownload L4T...       "
         wget -qO- $BSP | tar -jxpf - -C $JETSON_BUILD_DIR
         printf "[OK]\n"
+
+        # Fix nvidia's bugs in various BSP scripts
+        case "$BSP" in
+            *32.5*)
+                # Fix link dereferencing in 32.5 for xavier
+                sed -i 's/cp -f/cp -af/g' "$JETSON_BUILD_DIR/Linux_for_Tegra/tools/ota_tools/version_upgrade/ota_make_recovery_img_dtb.sh"
+                ;;
+            *32.6*)
+                # Our image is so small that 10% extra disk space is not enough so we add at least 128 on top of the 10%
+                sed -i 's/rootfs_size +/rootfs_size + 128 +/g' "/tmp/jetson-builder/build/Linux_for_Tegra/tools/jetson-disk-image-creator.sh"
+                ;;
+        esac
+        
 fi
 
 case "$JETSON_NANO_BOARD" in
