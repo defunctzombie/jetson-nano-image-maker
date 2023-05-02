@@ -22,10 +22,10 @@ jobs:
       JETSON_NANO_BOARD: ${{ matrix.board }}
       JETSON_NANO_REVISION: ${{ matrix.revision }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
+        uses: docker/setup-qemu-action@v2
 
       - name: Build docker image
         run: docker buildx build --platform linux/arm64 -t jetson-nano-image .
@@ -43,7 +43,7 @@ jobs:
           sudo -E ./create-image.sh
 
       - name: Upload image
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.board }}-r${{ matrix.revision }}
           path: |
