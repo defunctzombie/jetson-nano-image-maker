@@ -7,7 +7,7 @@
 
 set -e
 
-BSP=https://developer.nvidia.com/downloads/remetpack-463r32releasev73t210jetson-210linur3273aarch64tbz2
+BSP=https://developer.nvidia.com/downloads/embedded/l4t/r35_release_v3.1/release/jetson_linux_r35.3.1_aarch64.tbz2
 
 # Check if the user is not root
 if [ "x$(whoami)" != "xroot" ]; then
